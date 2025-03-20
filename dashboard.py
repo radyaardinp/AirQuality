@@ -12,48 +12,81 @@ except ModuleNotFoundError:
     subprocess.check_call(["pip", "install", "matplotlib"])
     import matplotlib.pyplot as plt
 
-# Fungsi untuk memuat dataset
-@st.cache_data
-def load_data():
-    df = pd.read_csv("df_all.csv")  
-    return df
+# Konfigurasi tema
+st.set_page_config(
+    page_title="Air Quality Dashboard",
+    layout="wide"
+)
+sns.set(style='dark')
 
-# Fungsi untuk menampilkan data
-def show_dataset(df):
-    st.subheader("📌 Dataset")
-    st.write(df.head())  # Menampilkan 5 data pertama
+# Menambahkan background bertema polusi
+background_style = """
+    <style>
+        .stApp {
+            background: url("https://images.unsplash.com/photo-1565958011703-44f9829ba187");
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    </style>
+"""
+st.markdown(background_style, unsafe_allow_html=True)
 
-# Fungsi untuk menampilkan statistika deskriptif
-def show_statistics(df):
-    st.subheader("📊 Statistika Deskriptif")
-    st.write(df.describe())  # Statistik ringkasan
+# Load dataset
+file_path = "main_data.csv"  # Sesuaikan dengan file dataset
+df = pd.read_csv(file_path)
 
-# Fungsi untuk visualisasi data
-def show_visualization(df):
-    st.subheader("📈 Visualisasi Data")
-    
-    # Contoh visualisasi distribusi satu variabel
-    selected_column = st.selectbox("Pilih Kolom untuk Histogram", df.columns)
-    fig, ax = plt.subplots(figsize=(8, 4))
-    sns.histplot(df[selected_column].dropna(), kde=True, ax=ax)
-    st.pyplot(fig)
+# Konversi tanggal dan waktu
+df["date"] = pd.to_datetime(df[["year", "month", "day"]])
+df["hour"] = df["hour"].astype(int)
 
-# Fungsi utama untuk menjalankan Streamlit App
-def main():
-    st.title("📊 Dashboard Analisis Data")
-    st.sidebar.header("Navigasi")
-    menu = ["Dataset", "Statistika Deskriptif", "Visualisasi Data"]
-    choice = st.sidebar.radio("Pilih Menu", menu)
+# Sidebar untuk filter
+st.sidebar.header("Filter Data")
+selected_location = st.sidebar.selectbox("Pilih Wilayah", df["station"].unique())
+start_year, end_year = st.sidebar.slider("Pilih Rentang Tahun", int(df["year"].min()), int(df["year"].max()), (2013, 2017))
 
-    df = load_data()  # Load dataset
+# Filter dataset
+df_filtered = df[(df["station"] == selected_location) & (df["year"].between(start_year, end_year))]
 
-    if choice == "Dataset":
-        show_dataset(df)
-    elif choice == "Statistika Deskriptif":
-        show_statistics(df)
-    elif choice == "Visualisasi Data":
-        show_visualization(df)
+# Judul utama
+st.title("📊 Air Quality Dashboard")
+st.subheader(f"Wilayah: {selected_location} ({start_year} - {end_year})")
 
-# Menjalankan aplikasi
-if __name__ == "__main__":
-    main()
+# 1️⃣ **Tren Kualitas Udara Tiap Tahun**
+st.subheader("📈 Tren Kualitas Udara")
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.lineplot(x="date", y="PM2.5", data=df_filtered, ax=ax, color="red")
+ax.set_title("Tren Polusi PM2.5 dari Tahun ke Tahun", fontsize=14)
+ax.set_ylabel("Konsentrasi PM2.5 (µg/m³)")
+ax.set_xlabel("Tanggal")
+st.pyplot(fig)
+
+# 2️⃣ **Hubungan Kondisi Cuaca dengan Polusi**
+st.subheader("🌦️ Pengaruh Kondisi Cuaca terhadap Polusi")
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.scatterplot(x="TEMP", y="PM2.5", data=df_filtered, ax=ax, alpha=0.5, color="blue")
+ax.set_title("Hubungan Suhu dengan PM2.5", fontsize=14)
+ax.set_ylabel("PM2.5 (µg/m³)")
+ax.set_xlabel("Suhu (°C)")
+st.pyplot(fig)
+
+# 3️⃣ **Perbandingan Kualitas Udara antar Wilayah**
+st.subheader("📊 Perbandingan Polusi antar Wilayah")
+df_avg_pm25 = df.groupby("station")["PM2.5"].mean().reset_index()
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.barplot(x="station", y="PM2.5", data=df_avg_pm25, ax=ax, palette="Reds")
+ax.set_title("Rata-rata PM2.5 per Wilayah", fontsize=14)
+ax.set_ylabel("Rata-rata PM2.5 (µg/m³)")
+ax.set_xlabel("Wilayah")
+st.pyplot(fig)
+
+# 4️⃣ **Jam dengan Kualitas Udara Terburuk**
+st.subheader("⏰ Jam dengan Polusi Tertinggi")
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.lineplot(x="hour", y="PM2.5", data=df_filtered.groupby("hour").mean().reset_index(), ax=ax, color="darkred")
+ax.set_title("Rata-rata PM2.5 per Jam", fontsize=14)
+ax.set_ylabel("PM2.5 (µg/m³)")
+ax.set_xlabel("Jam")
+st.pyplot(fig)
+
+# Footer
+st.caption("📌 Data diambil dari PRSA Dataset Air Quality | Dashboard dibuat oleh Radya Ardi")
