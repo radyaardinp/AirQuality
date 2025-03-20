@@ -48,8 +48,7 @@ st.markdown("""
     <h1 class="center-text" style="font-size: 50px;"> AIR QUALITY DASHBOARD </h1>
     <h3 class="center-text" style="font-size: 30px;">Beijing 2013-2017</h3>
 """, unsafe_allow_html=True)
-
-st.write("")
+st.markdown("---")
 st.write("")
 
 # **Tren Kualitas Udara Tiap Tahun**
@@ -157,8 +156,6 @@ st.markdown("""
     </style>
     <h3 class="center-text" style="font-size: 24px;">🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi</h3>
 """, unsafe_allow_html=True)
-st.write("")
-st.write("")
 
 weather_factors = ["PM2.5", "TEMP", "PRES", "DEWP", "RAIN"]
 df_corr = df[weather_factors].corr()
@@ -180,8 +177,6 @@ st.markdown("""
     </style>
     <h3 class="center-text" style="font-size: 24px;">🌍 Perbedaan Tingkat Polusi antara Wilayah</h3>
 """, unsafe_allow_html=True)
-st.write("")
-st.write("")
 
 pollutants = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
 df_region_avg = df.groupby("station")[pollutants].mean().reset_index()
