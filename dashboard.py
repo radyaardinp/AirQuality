@@ -97,7 +97,7 @@ st.subheader("Tren Kualitas Udara per Tahun dan Wilayah")
 st.write("")
 
 # Pilihan wilayah
-regions = df["station"].unique()
+regions = df["station"].unique().tolist(
 regions.insert(0, "Semua Wilayah")
 selected_region = st.selectbox("Pilih Wilayah", regions)
 
