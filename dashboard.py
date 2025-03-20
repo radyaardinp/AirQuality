@@ -45,15 +45,22 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h1 class="center-text" style="font-size: 40px;"> AIR QUALITY DASHBOARD </h1>
-    <h3 class="center-text" style="font-size: 24px;">Beijing 2013-2017</h3>
+    <h1 class="center-text" style="font-size: 50px;"> AIR QUALITY DASHBOARD </h1>
+    <h3 class="center-text" style="font-size: 30px;">Beijing 2013-2017</h3>
 """, unsafe_allow_html=True)
 
 st.write("")
 st.write("")
 
 # **Tren Kualitas Udara Tiap Tahun**
-st.header("Kualitas Udara Berdasarkan PM2.5")
+st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h3 class="center-text" style="font-size: 25px;">Kualitas Udara Berdasarkan PM2.5</h3>
+""", unsafe_allow_html=True)
 st.write("")
 
 # Fungsi untuk mengkategorikan kualitas udara
@@ -75,7 +82,14 @@ col1, col2 = st.columns(2)  # Membagi tampilan menjadi dua kolom
 
 #Tabel Keterangan Pembagian Kualitas Udara
 with col1:
-    st.subheader("Kategori Kualitas Udara")
+    st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h3 class="center-text" style="font-size: 20px;">Kategori Kualitas Udara</h3>
+""", unsafe_allow_html=True)
     st.markdown("""
     | PM2.5 (µg/m³) | Kategori |
     |--------------|----------|
@@ -88,7 +102,14 @@ with col1:
     
 #1. Tabel Distribusi Kualitas Udara per Wilayah 
 with col2:
-    st.subheader("Distribusi Kualitas Udara per Wilayah")
+    st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h3 class="center-text" style="font-size: 20px;">Distribusi Kualitas Udara per Wilayah</h3>
+""", unsafe_allow_html=True)
     region_quality_df = df.groupby(["station", "air_quality_category"]).size().reset_index(name="count")
     st.dataframe(region_quality_df)
 
@@ -134,7 +155,7 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h3 class="center-text" style="font-size: 18px;">🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi</h3>
+    <h3 class="center-text" style="font-size: 24px;">🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi</h3>
 """, unsafe_allow_html=True)
 st.write("")
 st.write("")
@@ -157,7 +178,7 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h3 class="center-text" style="font-size: 18px;">🌍 Perbedaan Tingkat Polusi antara Wilayah</h3>
+    <h3 class="center-text" style="font-size: 24px;">🌍 Perbedaan Tingkat Polusi antara Wilayah</h3>
 """, unsafe_allow_html=True)
 st.write("")
 st.write("")
@@ -196,7 +217,7 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h3 class="center-text" style="font-size: 18px;">⏰ Waktu dengan Kualitas Udara Paling Buruk</h3>
+    <h3 class="center-text" style="font-size: 24px;">⏰ Waktu dengan Kualitas Udara Paling Buruk</h3>
 """, unsafe_allow_html=True)
 df_hourly = df.groupby(["hour", "station"])["PM2.5"].mean().reset_index()
 
