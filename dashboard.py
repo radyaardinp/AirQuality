@@ -19,13 +19,12 @@ st.set_page_config(
 )
 sns.set(style='dark')
 
-# Menambahkan background bertema polusi
+# Menambahkan background
 background_style = """
     <style>
         .stApp {
-            background: url("https://images.unsplash.com/photo-1565958011703-44f9829ba187");
-            background-size: cover;
-            background-attachment: fixed;
+            background: linear-gradient(to bottom, #191d26, #000000);
+            color: white;
         }
     </style>
 """
