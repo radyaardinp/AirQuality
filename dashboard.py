@@ -38,17 +38,9 @@ df = pd.read_csv(file_path)
 df["date"] = pd.to_datetime(df[["year", "month", "day"]])
 df["hour"] = df["hour"].astype(int)
 
-# Sidebar untuk filter
-st.sidebar.header("Filter Data")
-selected_location = st.sidebar.selectbox("Pilih Wilayah", df["station"].unique())
-start_year, end_year = st.sidebar.slider("Pilih Rentang Tahun", int(df["year"].min()), int(df["year"].max()), (2013, 2017))
-
-# Filter dataset
-df_filtered = df[(df["station"] == selected_location) & (df["year"].between(start_year, end_year))]
-
 # Judul utama
 st.title("📊 Air Quality Dashboard")
-st.subheader(f"Wilayah: {selected_location} ({start_year} - {end_year})")
+st.subheader(f"Beijing 2013-2017")
 
 # **Tren Kualitas Udara Tiap Tahun**
 st.header("Kualitas Udara Berdasarkan PM2.5")
@@ -83,7 +75,7 @@ with col1:
     | > 250.5      | Berbahaya |
     """)
     
-#Tabel Distribusi Kualitas Udara per Wilayah 
+#1. Tabel Distribusi Kualitas Udara per Wilayah 
 with col2:
     st.subheader("Distribusi Kualitas Udara per Wilayah")
     region_quality_df = df.groupby(["station", "air_quality_category"]).size().reset_index(name="count")
@@ -113,32 +105,44 @@ ax.set_title(f"Tren Polutan Udara di {selected_region}")
 ax.legend()
 st.pyplot(fig)
 
-# 2️⃣ **Hubungan Kondisi Cuaca dengan Polusi**
-st.subheader("🌦️ Pengaruh Kondisi Cuaca terhadap Polusi")
-fig, ax = plt.subplots(figsize=(12, 6))
-sns.scatterplot(x="TEMP", y="PM2.5", data=df_filtered, ax=ax, alpha=0.5, color="blue")
-ax.set_title("Hubungan Suhu dengan PM2.5", fontsize=14)
-ax.set_ylabel("PM2.5 (µg/m³)")
-ax.set_xlabel("Suhu (°C)")
+# 2. Hubungan Kondisi Cuaca dengan Polusi**
+st.subheader("🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi")
+weather_factors = ["PM2.5", "temp", "pres", "dewp", "rain"]
+df_corr = df_filtered[weather_factors].corr()
+fig, ax = plt.subplots(figsize=(8, 6))
+sns.heatmap(df_corr, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
+ax.set_title("Heatmap Korelasi PM2.5 dengan Faktor Cuaca", fontsize=14)
 st.pyplot(fig)
 
-# 3️⃣ **Perbandingan Kualitas Udara antar Wilayah**
-st.subheader("📊 Perbandingan Polusi antar Wilayah")
-df_avg_pm25 = df.groupby("station")["PM2.5"].mean().reset_index()
-fig, ax = plt.subplots(figsize=(10, 5))
-sns.barplot(x="station", y="PM2.5", data=df_avg_pm25, ax=ax, palette="Reds")
-ax.set_title("Rata-rata PM2.5 per Wilayah", fontsize=14)
-ax.set_ylabel("Rata-rata PM2.5 (µg/m³)")
+st.info("💡 note: nilai yang mendekati 0 berarti tidak memiliki korelasi, sedangkan nilai yang mendekati angka 1 berarti memiliki korelasi.")
+
+
+#3. Perbandingan Kualitas Udara antar Wilayah
+st.subheader("🌍 Perbedaan Tingkat Polusi antara Wilayah")
+pollutants = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
+df_region_avg = df_filtered.groupby("region")[pollutants].mean().reset_index()
+st.dataframe(df_region_avg.style.format("{:.2f}"))
+
+# Visualisasi Bar Plot
+fig, ax = plt.subplots(figsize=(10, 6))
+df_region_avg.set_index("region")[pollutants].plot(kind="bar", ax=ax, colormap="viridis")
+ax.set_title("Rata-rata Polutan per Wilayah", fontsize=14)
+ax.set_ylabel("Konsentrasi Polutan (µg/m³)")
 ax.set_xlabel("Wilayah")
+plt.xticks(rotation=45)
 st.pyplot(fig)
 
-# 4️⃣ **Jam dengan Kualitas Udara Terburuk**
-st.subheader("⏰ Jam dengan Polusi Tertinggi")
+# 4. Jam dengan Kualitas Udara Terburuk**
+st.subheader("⏰ Jam dengan Kualitas Udara Paling Buruk")
+df_hourly = df_filtered.groupby(["hour", "region"])["PM2.5"].mean().reset_index()
+
+# Plot data
 fig, ax = plt.subplots(figsize=(12, 6))
-sns.lineplot(x="hour", y="PM2.5", data=df_filtered.groupby("hour").mean().reset_index(), ax=ax, color="darkred")
-ax.set_title("Rata-rata PM2.5 per Jam", fontsize=14)
+sns.lineplot(data=df_hourly, x="hour", y="PM2.5", hue="region", marker="o", ax=ax)
+ax.set_title("Rata-rata PM2.5 Berdasarkan Jam untuk Setiap Wilayah", fontsize=14)
 ax.set_ylabel("PM2.5 (µg/m³)")
 ax.set_xlabel("Jam")
+ax.legend(title="Wilayah")
 st.pyplot(fig)
 
 # Footer
