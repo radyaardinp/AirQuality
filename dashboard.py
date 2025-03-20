@@ -121,7 +121,8 @@ st.info("💡 note: nilai yang mendekati 0 berarti tidak memiliki korelasi, seda
 st.subheader("🌍 Perbedaan Tingkat Polusi antara Wilayah")
 pollutants = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
 df_region_avg = df.groupby("station")[pollutants].mean().reset_index()
-st.dataframe(df_region_avg.style.format("{:.2f}"))
+df_region_avg[pollutants] = df_region_avg[pollutants].astype(float)
+st.dataframe(df_region_avg.style.format({col: "{:.2f}" for col in pollutants}))
 
 # Visualisasi Bar Plot
 fig, ax = plt.subplots(figsize=(10, 6))
