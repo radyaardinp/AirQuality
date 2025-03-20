@@ -107,7 +107,7 @@ st.pyplot(fig)
 
 # 2. Hubungan Kondisi Cuaca dengan Polusi**
 st.subheader("🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi")
-weather_factors = ["PM2.5", "temp", "pres", "dewp", "rain"]
+weather_factors = ["PM2.5", "TEMP", "PRES", "DEWP", "RAIN"]
 df_corr = df[weather_factors].corr()
 fig, ax = plt.subplots(figsize=(8, 6))
 sns.heatmap(df_corr, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
@@ -120,7 +120,7 @@ st.info("💡 note: nilai yang mendekati 0 berarti tidak memiliki korelasi, seda
 #3. Perbandingan Kualitas Udara antar Wilayah
 st.subheader("🌍 Perbedaan Tingkat Polusi antara Wilayah")
 pollutants = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
-df_region_avg = df_filtered.groupby("region")[pollutants].mean().reset_index()
+df_region_avg = df.groupby("station")[pollutants].mean().reset_index()
 st.dataframe(df_region_avg.style.format("{:.2f}"))
 
 # Visualisasi Bar Plot
@@ -134,7 +134,7 @@ st.pyplot(fig)
 
 # 4. Jam dengan Kualitas Udara Terburuk**
 st.subheader("⏰ Jam dengan Kualitas Udara Paling Buruk")
-df_hourly = df_filtered.groupby(["hour", "region"])["PM2.5"].mean().reset_index()
+df_hourly = df.groupby(["hour", "station"])["PM2.5"].mean().reset_index()
 
 # Plot data
 fig, ax = plt.subplots(figsize=(12, 6))
