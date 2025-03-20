@@ -134,7 +134,7 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h3 class="center-text">style="font-size: 18px; 🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi</h3>
+    <h3 class="center-text" style="font-size: 18px; > 🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi</h3>
 """, unsafe_allow_html=True)
 st.write("")
 st.write("")
@@ -157,7 +157,7 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h3 class="center-text">style="font-size: 18px;🌍 Perbedaan Tingkat Polusi antara Wilayah</h3>
+    <h3 class="center-text" style="font-size: 18px;>🌍 Perbedaan Tingkat Polusi antara Wilayah</h3>
 """, unsafe_allow_html=True)
 st.write("")
 st.write("")
@@ -196,7 +196,7 @@ st.markdown("""
             text-align: center;
         }
     </style>
-    <h3 class="center-text">style="font-size: 18px; ⏰ Waktu dengan Kualitas Udara Paling Buruk</h3>
+    <h3 class="center-text" style="font-size: 18px;>⏰ Waktu dengan Kualitas Udara Paling Buruk</h3>
 """, unsafe_allow_html=True)
 df_hourly = df.groupby(["hour", "station"])["PM2.5"].mean().reset_index()
 
