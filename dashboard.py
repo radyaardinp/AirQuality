@@ -39,11 +39,22 @@ df["date"] = pd.to_datetime(df[["year", "month", "day"]])
 df["hour"] = df["hour"].astype(int)
 
 # Judul utama
-st.title("📊 Air Quality Dashboard")
-st.subheader(f"Beijing 2013-2017")
+st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h1 class="center-text" style="font-size: 40px;"> AIR QUALITY DASHBOARD </h1>
+    <h3 class="center-text" style="font-size: 24px;">Beijing 2013-2017</h3>
+""", unsafe_allow_html=True)
+
+st.write("")
+st.write("")
 
 # **Tren Kualitas Udara Tiap Tahun**
 st.header("Kualitas Udara Berdasarkan PM2.5")
+st.write("")
 
 # Fungsi untuk mengkategorikan kualitas udara
 def categorize_pm25(pm25):
@@ -83,13 +94,22 @@ with col2:
 
 #Line Plot Tren Rata-Rata Tiap Parameter per Tahun dan Wilayah
 st.subheader("Tren Kualitas Udara per Tahun dan Wilayah")
+st.write("")
 
 # Pilihan wilayah
 regions = df["station"].unique()
+regions.insert(0, "Semua Wilayah")
 selected_region = st.selectbox("Pilih Wilayah", regions)
 
-# Filter data berdasarkan wilayah yang dipilih
-df_region = df[df["station"] == selected_region]
+# Filter data berdasarkan pilihan
+if selected_region == "Semua Wilayah":
+    df_region = df  
+else:
+    df_region = df[df["station"] == selected_region]  # Filter berdasarkan wilayah tertentu
+
+# Tampilkan hasil filter
+st.write(f"Menampilkan data untuk: **{selected_region}**")
+st.dataframe(df_region.head())
 
 # Agregasi data: menghitung rata-rata per tahun untuk tiap parameter
 df_trend = df_region.groupby("year")[["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]].mean().reset_index()
@@ -104,9 +124,21 @@ ax.set_ylabel("Konsentrasi Polutan")
 ax.set_title(f"Tren Polutan Udara di {selected_region}")
 ax.legend()
 st.pyplot(fig)
+st.write("")
+st.write("")
 
 # 2. Hubungan Kondisi Cuaca dengan Polusi**
-st.subheader("🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi")
+st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h3 class="center-text">style="font-size: 18px; 🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi</h3>
+""", unsafe_allow_html=True)
+st.write("")
+st.write("")
+
 weather_factors = ["PM2.5", "TEMP", "PRES", "DEWP", "RAIN"]
 df_corr = df[weather_factors].corr()
 fig, ax = plt.subplots(figsize=(8, 6))
@@ -115,10 +147,21 @@ ax.set_title("Heatmap Korelasi PM2.5 dengan Faktor Cuaca", fontsize=14)
 st.pyplot(fig)
 
 st.info("💡 note: nilai yang mendekati 0 berarti tidak memiliki korelasi, sedangkan nilai yang mendekati angka 1 berarti memiliki korelasi.")
-
+st.write("")
+st.write("")
 
 #3. Perbandingan Kualitas Udara antar Wilayah
-st.subheader("🌍 Perbedaan Tingkat Polusi antara Wilayah")
+st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h3 class="center-text">style="font-size: 18px;🌍 Perbedaan Tingkat Polusi antara Wilayah</h3>
+""", unsafe_allow_html=True)
+st.write("")
+st.write("")
+
 pollutants = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
 df_region_avg = df.groupby("station")[pollutants].mean().reset_index()
 df_region_avg[pollutants] = df_region_avg[pollutants].astype(float)
@@ -132,9 +175,29 @@ ax.set_ylabel("Konsentrasi Polutan (µg/m³)")
 ax.set_xlabel("Wilayah")
 plt.xticks(rotation=45)
 st.pyplot(fig)
+st.write("")
+
+fig, ax = plt.subplots(figsize=(12, 6))
+    sns.barplot(x="station", y="PM2.5", data=df, estimator=lambda x: x.mean(), ci="sd", ax=ax)
+    
+# Atur tampilan plot
+ax.set_title("Rata-rata PM2.5 di Setiap Wilayah", fontsize=14)
+ax.set_xlabel("Wilayah", fontsize=12)
+ax.set_ylabel("PM2.5 (µg/m³)", fontsize=12)
+plt.xticks(rotation=45)
+st.pyplot(fig)
+st.write("")
+st.write("")
 
 # 4. Jam dengan Kualitas Udara Terburuk**
-st.subheader("⏰ Jam dengan Kualitas Udara Paling Buruk")
+st.markdown("""
+    <style>
+        .center-text {
+            text-align: center;
+        }
+    </style>
+    <h3 class="center-text">style="font-size: 18px; ⏰ Waktu dengan Kualitas Udara Paling Buruk</h3>
+""", unsafe_allow_html=True)
 df_hourly = df.groupby(["hour", "station"])["PM2.5"].mean().reset_index()
 
 # Plot data
@@ -145,6 +208,10 @@ ax.set_ylabel("PM2.5 (µg/m³)")
 ax.set_xlabel("Jam")
 ax.legend(title="Wilayah")
 st.pyplot(fig)
+st.write("")
+st.write("")
+st.write("")
+st.write("")
 
 # Footer
-st.caption("📌 Data diambil dari PRSA Dataset Air Quality | Dashboard dibuat oleh Radya Ardi")
+st.caption("Made by Radya Ardi MC296D5X1815")
