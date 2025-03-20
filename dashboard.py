@@ -108,7 +108,7 @@ st.pyplot(fig)
 # 2. Hubungan Kondisi Cuaca dengan Polusi**
 st.subheader("🌦️ Korelasi antara Kondisi Cuaca dan Tingkat Polusi")
 weather_factors = ["PM2.5", "temp", "pres", "dewp", "rain"]
-df_corr = df_filtered[weather_factors].corr()
+df_corr = df[weather_factors].corr()
 fig, ax = plt.subplots(figsize=(8, 6))
 sns.heatmap(df_corr, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
 ax.set_title("Heatmap Korelasi PM2.5 dengan Faktor Cuaca", fontsize=14)
