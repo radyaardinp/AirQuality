@@ -126,7 +126,7 @@ st.dataframe(df_region_avg.style.format({col: "{:.2f}" for col in pollutants}))
 
 # Visualisasi Bar Plot
 fig, ax = plt.subplots(figsize=(10, 6))
-df_region_avg.set_index("region")[pollutants].plot(kind="bar", ax=ax, colormap="viridis")
+df_region_avg.set_index("station")[pollutants].plot(kind="bar", ax=ax, colormap="viridis")
 ax.set_title("Rata-rata Polutan per Wilayah", fontsize=14)
 ax.set_ylabel("Konsentrasi Polutan (µg/m³)")
 ax.set_xlabel("Wilayah")
@@ -139,7 +139,7 @@ df_hourly = df.groupby(["hour", "station"])["PM2.5"].mean().reset_index()
 
 # Plot data
 fig, ax = plt.subplots(figsize=(12, 6))
-sns.lineplot(data=df_hourly, x="hour", y="PM2.5", hue="region", marker="o", ax=ax)
+sns.lineplot(data=df_hourly, x="hour", y="PM2.5", hue="station", marker="o", ax=ax)
 ax.set_title("Rata-rata PM2.5 Berdasarkan Jam untuk Setiap Wilayah", fontsize=14)
 ax.set_ylabel("PM2.5 (µg/m³)")
 ax.set_xlabel("Jam")
