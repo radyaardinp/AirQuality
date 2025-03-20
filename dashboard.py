@@ -178,7 +178,7 @@ st.pyplot(fig)
 st.write("")
 
 fig, ax = plt.subplots(figsize=(12, 6))
-    sns.barplot(x="station", y="PM2.5", data=df, estimator=lambda x: x.mean(), ci="sd", ax=ax)
+sns.barplot(x="station", y="PM2.5", data=df, estimator=lambda x: x.mean(), ci="sd", ax=ax)
     
 # Atur tampilan plot
 ax.set_title("Rata-rata PM2.5 di Setiap Wilayah", fontsize=14)
