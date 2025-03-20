@@ -31,7 +31,7 @@ background_style = """
 st.markdown(background_style, unsafe_allow_html=True)
 
 # Load dataset
-file_path = "main_data.csv"  # Sesuaikan dengan file dataset
+file_path = "main_data.csv"
 df = pd.read_csv(file_path)
 
 # Konversi tanggal dan waktu
@@ -50,13 +50,67 @@ df_filtered = df[(df["station"] == selected_location) & (df["year"].between(star
 st.title("📊 Air Quality Dashboard")
 st.subheader(f"Wilayah: {selected_location} ({start_year} - {end_year})")
 
-# 1️⃣ **Tren Kualitas Udara Tiap Tahun**
-st.subheader("📈 Tren Kualitas Udara")
-fig, ax = plt.subplots(figsize=(12, 6))
-sns.lineplot(x="date", y="PM2.5", data=df_filtered, ax=ax, color="red")
-ax.set_title("Tren Polusi PM2.5 dari Tahun ke Tahun", fontsize=14)
-ax.set_ylabel("Konsentrasi PM2.5 (µg/m³)")
-ax.set_xlabel("Tanggal")
+# **Tren Kualitas Udara Tiap Tahun**
+st.header("Kualitas Udara Berdasarkan PM2.5")
+
+# Fungsi untuk mengkategorikan kualitas udara
+def categorize_pm25(pm25):
+    if pm25 <= 15.5:
+        return "Baik"
+    elif 15.6 <= pm25 <= 55.4:
+        return "Sedang"
+    elif 55.5 <= pm25 <= 150.4:
+        return "Tidak Sehat"
+    elif 150.5 <= pm25 <= 250.4:
+        return "Sangat Tidak Sehat"
+    else:
+        return "Berbahaya"
+
+df["air_quality_category"] = df["PM2.5"].apply(categorize_pm25)
+
+col1, col2 = st.columns(2)  # Membagi tampilan menjadi dua kolom
+
+#Tabel Keterangan Pembagian Kualitas Udara
+with col1:
+    st.subheader("Kategori Kualitas Udara")
+    st.markdown("""
+    | PM2.5 (µg/m³) | Kategori |
+    |--------------|----------|
+    | 0 - 15.5    | Baik |
+    | 15.6 - 55.4  | Sedang |
+    | 55.5 - 150.4 | Tidak Sehat |
+    | 150.5 - 250.4 | Sangat Tidak Sehat |
+    | > 250.5      | Berbahaya |
+    """)
+    
+#Tabel Distribusi Kualitas Udara per Wilayah 
+with col2:
+    st.subheader("Distribusi Kualitas Udara per Wilayah")
+    region_quality_df = df.groupby(["station", "air_quality_category"]).size().reset_index(name="count")
+    st.dataframe(region_quality_df)
+
+#Line Plot Tren Rata-Rata Tiap Parameter per Tahun dan Wilayah
+st.subheader("Tren Kualitas Udara per Tahun dan Wilayah")
+
+# Pilihan wilayah
+regions = df["station"].unique()
+selected_region = st.selectbox("Pilih Wilayah", regions)
+
+# Filter data berdasarkan wilayah yang dipilih
+df_region = df[df["station"] == selected_region]
+
+# Agregasi data: menghitung rata-rata per tahun untuk tiap parameter
+df_trend = df_region.groupby("year")[["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]].mean().reset_index()
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 5))
+for column in ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]:
+    ax.plot(df_trend["year"], df_trend[column], marker='o', label=column)
+
+ax.set_xlabel("Tahun")
+ax.set_ylabel("Konsentrasi Polutan")
+ax.set_title(f"Tren Polutan Udara di {selected_region}")
+ax.legend()
 st.pyplot(fig)
 
 # 2️⃣ **Hubungan Kondisi Cuaca dengan Polusi**
